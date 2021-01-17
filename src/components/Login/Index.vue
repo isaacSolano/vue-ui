@@ -46,58 +46,52 @@
               <v-btn color="primary" class="ml-2" @click="verifyInformation()">
                 Let's go !
               </v-btn>
-              <!-- Snackbar Start -->
-              <v-snackbar
-                v-model="isSnackbarOpen"
-                :color="snackbarColor"
-                :timeout="timeout"
-              >
-                {{ snackbarText }}
-
-                <template v-slot:action="{ attrs }">
-                  <v-btn
-                    fab
-                    small
-                    text
-                    v-bind="attrs"
-                    @click="isSnackbarOpen = false"
-                  >
-                    <v-icon dark>mdi-close</v-icon>
-                  </v-btn>
-                </template>
-              </v-snackbar>
-              <!-- Snackbar End -->
             </v-col>
           </v-row>
         </v-form>
       </v-col>
     </v-row>
-
     <LoadingScreen v-if="showLoadingScreen" />
+    <Snackbar
+      :snackbarText="snackbarText"
+      :snackbarColor="snackbarColor"
+      :isSnackbarOpen="isSnackbarOpen"
+      @closeSnackbar="closeSnackbar"
+    />
   </v-container>
 </template>
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
 
-import LoadingScreen from "../../common/LoadingScreen/Index.vue";
-
+// Common
 import {
   inputValidationRules,
   snackBarTimeout,
   successColor
-} from "../../common/variables";
-import { UserService } from "../../services/user.service";
-import { Response } from "../../models/Response";
+} from "@/common/variables";
+
+// Services
+import { UserService } from "@/services/user.service";
+import { SessionService } from "@/services/session.service";
+
+// Models
+import { Response } from "@/models/Response";
+import { StatusEnum } from "@/models/StatusEnum";
+
+// Other components
+import LoadingScreen from "@/common/LoadingScreen/Index.vue";
+import Snackbar from "@/common/Snackbar/Index.vue";
 
 @Component({
-  components: { LoadingScreen }
+  components: { LoadingScreen, Snackbar }
 })
 export default class Login extends Vue {
   rules = inputValidationRules;
   timeout = snackBarTimeout;
 
   userService: UserService;
+  sessionService: SessionService;
 
   EmailAddress: string;
   Password: string;
@@ -112,6 +106,7 @@ export default class Login extends Vue {
     super();
 
     this.userService = new UserService();
+    this.sessionService = new SessionService();
 
     this.EmailAddress = "";
     this.Password = "";
@@ -132,14 +127,17 @@ export default class Login extends Vue {
         .then((res: Response) => {
           this.isSnackbarOpen = true;
           switch (res.Type) {
-            case "Error":
+            case StatusEnum.Error:
               this.openSnackbar(res.Message, "error");
               break;
 
-            case "Success":
+            case StatusEnum.Success:
               this.openSnackbar(res.Message, successColor);
               this.showLoadingScreen = true;
-              this.userService.setActiveUser(this.EmailAddress);
+              this.sessionService.createSession(
+                "activeUser",
+                this.EmailAddress
+              );
               setTimeout(
                 () => (
                   (this.showLoadingScreen = false),
@@ -157,6 +155,12 @@ export default class Login extends Vue {
     this.isSnackbarOpen = true;
     this.snackbarText = text;
     this.snackbarColor = color;
+  }
+
+  closeSnackbar() {
+    this.isSnackbarOpen = false;
+    this.snackbarText = "";
+    this.snackbarColor = "";
   }
 }
 </script>

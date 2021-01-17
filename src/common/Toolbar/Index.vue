@@ -2,18 +2,17 @@
   <v-toolbar dense>
     <v-container>
       <v-row class="d-flex flex-row justify-space-between">
-        <v-col
-          class="d-flex flex-row justify-space-between align-center"
-          cols="2"
-        >
+        <v-col class="d-flex flex-row justify-start align-center" cols="4">
           <v-icon color="primary" :dense="true" :large="true">
             mdi-account-circle
           </v-icon>
-          <v-toolbar-title>{{ firstName }} {{ lastName }}</v-toolbar-title>
+          <v-toolbar-title class="px-2">
+            {{ firstName }} {{ lastName }}
+          </v-toolbar-title>
         </v-col>
 
         <v-col class="d-flex flex-row justify-end" cols="4">
-          <v-btn color="error">Logout</v-btn>
+          <v-btn color="error" @click="closeSession()">Logout</v-btn>
         </v-col>
       </v-row>
     </v-container>
@@ -22,22 +21,47 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import { Prop } from "vue-property-decorator";
+import { Prop, Emit } from "vue-property-decorator";
 
-import { errorColor } from "../variables";
+// Common
+import { snackBarTimeout } from "@/common/variables";
+
+// Services
+import { UserService } from "@/services/user.service";
+import { SessionService } from "@/services/session.service";
 
 @Component({})
 export default class Toolbar extends Vue {
   @Prop() firstName: string;
   @Prop() lastName: string;
 
-  logoutColor = errorColor;
+  @Emit("getShowLoadingScreen")
+  willLoadingScreenShow(val: boolean) {
+    return val;
+  }
+
+  timeout = snackBarTimeout;
+
+  userService: UserService;
+  sessionService: SessionService;
 
   constructor() {
     super();
 
+    this.userService = new UserService();
+    this.sessionService = new SessionService();
+
     this.firstName = "";
     this.lastName = "";
+  }
+
+  closeSession() {
+    this.sessionService.closeSession("activeUser");
+    this.willLoadingScreenShow(true);
+    setTimeout(
+      () => (this.willLoadingScreenShow(true), this.$router.push("/")),
+      this.timeout
+    );
   }
 }
 </script>

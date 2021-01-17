@@ -70,32 +70,18 @@
               <v-btn color="primary" class="ml-2" @click="registerUser()">
                 Register Info
               </v-btn>
-              <!-- Snackbar Start -->
-              <v-snackbar
-                v-model="isSnackbarOpen"
-                :color="snackbarColor"
-                :timeout="timeout"
-              >
-                {{ snackbarText }}
-
-                <template v-slot:action="{ attrs }">
-                  <v-btn
-                    fab
-                    small
-                    text
-                    v-bind="attrs"
-                    @click="isSnackbarOpen = false"
-                  >
-                    <v-icon dark>mdi-close</v-icon>
-                  </v-btn>
-                </template>
-              </v-snackbar>
-              <!-- Snackbar End -->
             </v-col>
           </v-row>
         </v-form>
       </v-col>
     </v-row>
+    <LoadingScreen v-if="showLoadingScreen" />
+    <Snackbar
+      :isSnackbarOpen="isSnackbarOpen"
+      :snackbarText="snackbarText"
+      :snackbarColor="snackbarColor"
+      @closeSnackbar="closeSnackbar"
+    />
   </v-container>
 </template>
 
@@ -103,58 +89,93 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 
-// Models
-import { User } from "../../models/User";
-
+// Common variables
 import {
   inputValidationRules,
   snackBarTimeout,
   successColor
-} from "../../common/variables";
-import { UserService } from "../../services/user.service";
+} from "@/common/variables";
 
-@Component({})
+// Services
+import { UserService } from "@/services/user.service";
+
+// Models
+import { User } from "@/models/User";
+import { Response } from "@/models/Response";
+import { StatusEnum } from "@/models/StatusEnum";
+
+// Other components
+import Snackbar from "@/common/Snackbar/Index.vue";
+import LoadingScreen from "@/common/LoadingScreen/Index.vue";
+
+@Component({
+  components: { Snackbar, LoadingScreen }
+})
 export default class Register extends Vue {
   rules = inputValidationRules;
   timeout = snackBarTimeout;
 
-  userToBeRegistered: User;
   userService: UserService;
+  userToBeRegistered: User;
 
   snackbarText: string;
   snackbarColor: string;
 
   showPassword: boolean;
   isSnackbarOpen: boolean;
+  showLoadingScreen: boolean;
 
   constructor() {
     super();
 
-    this.userToBeRegistered = new User();
     this.userService = new UserService();
+    this.userToBeRegistered = new User();
 
     this.snackbarText = "";
     this.snackbarColor = "";
 
     this.showPassword = false;
     this.isSnackbarOpen = false;
+    this.showLoadingScreen = false;
   }
 
   registerUser() {
-    if (
-      this.userToBeRegistered.FirstName === "" ||
-      this.userToBeRegistered.LastName === "" ||
-      this.userToBeRegistered.EmailAddress === "" ||
-      this.userToBeRegistered.Password === ""
-    ) {
-      this.isSnackbarOpen = true;
-      this.snackbarText = "Please complete all the fields";
-      this.snackbarColor = "error";
+    if (!this.areValuesCorrect()) {
+      this.openSnackbar("Please complete all the fields", "error");
     } else {
-      this.snackbarText = this.userService.registerUser(
-        this.userToBeRegistered
-      );
-      this.snackbarColor = successColor;
+      this.showLoadingScreen = true;
+      this.userService
+        .registerUser(this.userToBeRegistered)
+        .then((res: Response) => {
+          if (res.Type === StatusEnum.Success) {
+            this.openSnackbar(res.Message, (this.snackbarColor = successColor));
+            this.showLoadingScreen = false;
+          }
+        });
+    }
+  }
+
+  areValuesCorrect() {
+    const validFirstName = this.rules.required(
+        this.userToBeRegistered.FirstName
+      ),
+      validLastName = this.rules.required(this.userToBeRegistered.LastName),
+      validEmail =
+        this.rules.required(this.userToBeRegistered.EmailAddress) &&
+        this.rules.email(this.userToBeRegistered.EmailAddress),
+      validPassword =
+        this.rules.required(this.userToBeRegistered.Password) &&
+        this.rules.min(this.userToBeRegistered.Password);
+
+    if (
+      validFirstName === true &&
+      validLastName === true &&
+      validEmail === true &&
+      validPassword === true
+    ) {
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -162,6 +183,13 @@ export default class Register extends Vue {
     this.isSnackbarOpen = true;
     this.snackbarText = text;
     this.snackbarColor = color;
+    setTimeout(() => this.closeSnackbar(), this.timeout);
+  }
+
+  closeSnackbar() {
+    this.isSnackbarOpen = false;
+    this.snackbarText = "";
+    this.snackbarColor = "";
   }
 }
 </script>

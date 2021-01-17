@@ -7,6 +7,6 @@ export const inputValidationRules = {
   min: (val: string) => val.length >= 8 || "Min 8 characters"
 };
 
-export const snackBarTimeout = 3000;
+export const snackBarTimeout = 2000;
 export const successColor = "light-green darken-1";
 export const errorColor = "red darken-2";

@@ -1,5 +1,6 @@
 import { User } from "@/models/User";
 import { Response } from "@/models/Response";
+import { StatusEnum } from "@/models/StatusEnum";
 
 export class UserService {
   public async loginUser(
@@ -9,28 +10,26 @@ export class UserService {
     const userToBeVerified: User = this.getUserById(emailAddress);
 
     if (userToBeVerified === undefined) {
-      return new Response("Error", "This email address is not registered");
+      return new Response(
+        StatusEnum.Error,
+        "This email address is not registered."
+      );
     } else if (userToBeVerified.Password === password) {
-      return new Response("Success", "Welcome :)");
+      return new Response(StatusEnum.Success, "Welcome :)");
     } else {
-      return new Response("Error", "Sorry, the password is incorrect");
+      return new Response(
+        StatusEnum.Error,
+        "Sorry, the user couldn't be verified."
+      );
     }
   }
 
-  public setActiveUser(emailAddress: string) {
-    sessionStorage.setItem("activeUser", emailAddress);
-  }
-
-  public getActiveUser(): string {
-    return sessionStorage.getItem("activeUser") || "null";
-  }
-
-  public registerUser(user: User): string {
+  public async registerUser(user: User): Promise<Response> {
     const allUsers: Array<unknown> = [];
     allUsers.push(user);
     localStorage.setItem("usersLS", JSON.stringify(allUsers));
 
-    return "User registered";
+    return new Response(StatusEnum.Success, "User registered");
   }
 
   public getUserById(id: string): User {

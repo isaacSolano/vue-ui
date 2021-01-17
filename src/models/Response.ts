@@ -1,8 +1,10 @@
+import { StatusEnum } from "./StatusEnum";
+
 export class Response {
-  Type: string;
+  Type: StatusEnum;
   Message: string;
 
-  constructor(type: string, message: string) {
+  constructor(type: StatusEnum, message: string) {
     this.Type = type;
     this.Message = message;
   }

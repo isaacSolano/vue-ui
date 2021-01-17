@@ -1,10 +1,10 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 
-import Home from "../components/Home/Index.vue";
-import Register from "../components/Register/Index.vue";
-import Login from "../components/Login/Index.vue";
-import Dashboard from "../components/Dashboard/Index.vue";
+import Home from "@/components/Home/Index.vue";
+import Register from "@/components/Register/Index.vue";
+import Login from "@/components/Login/Index.vue";
+import Dashboard from "@/components/Dashboard/Index.vue";
 
 Vue.use(VueRouter);
 
