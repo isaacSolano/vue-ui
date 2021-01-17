@@ -1,0 +1,20 @@
+@font-face{
+  font-family: OpenSansLight;  
+  src: url("../assets/fonts/OpenSans-Light.ttf");
+}
+@font-face{
+  font-family: OpenSansRegular;  
+  src: url("../assets/fonts/OpenSans-Regular.ttf");
+}
+
+@import "./variables.scss";
+@import '~vuetify/src/styles/main.sass';
+
+.v-application {
+  color: $font-color !important;
+  font-family: 'OpenSansRegular', sans-serif !important;
+  
+  .text-h1, .text-h2, .text-h3, .text-h4, .text-h5, .v-btn {
+    font-family: 'OpenSansLight', sans-serif !important;
+  }
+}
