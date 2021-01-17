@@ -8,7 +8,12 @@
 
     <v-row class="d-flex flex-column align-center">
       <v-col cols="6">
-        <v-form class="d-flex flex-column">
+        <v-form
+          class="d-flex flex-column"
+          ref="form"
+          v-model="valid"
+          lazy-validation
+        >
           <v-row class="d-flex flex-row">
             <v-col cols="6">
               <v-label>First Name: </v-label>
@@ -67,7 +72,12 @@
               <v-btn to="/" color="secondary" class="mr-2">
                 Back
               </v-btn>
-              <v-btn color="primary" class="ml-2" @click="registerUser()">
+              <v-btn
+                color="primary"
+                class="ml-2"
+                :disabled="!valid"
+                @click="registerUser"
+              >
                 Register Info
               </v-btn>
             </v-col>
@@ -88,6 +98,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
+import { Ref } from "vue-property-decorator";
 
 // Common variables
 import {
@@ -103,6 +114,7 @@ import { UserService } from "@/services/user.service";
 import { User } from "@/models/User";
 import { Response } from "@/models/Response";
 import { StatusEnum } from "@/models/StatusEnum";
+import { VForm } from "@/models/Types";
 
 // Other components
 import Snackbar from "@/common/Snackbar/Index.vue";
@@ -112,6 +124,8 @@ import LoadingScreen from "@/common/LoadingScreen/Index.vue";
   components: { Snackbar, LoadingScreen }
 })
 export default class Register extends Vue {
+  @Ref("form") readonly form!: VForm;
+
   rules = inputValidationRules;
   timeout = snackBarTimeout;
 
@@ -124,6 +138,7 @@ export default class Register extends Vue {
   showPassword: boolean;
   isSnackbarOpen: boolean;
   showLoadingScreen: boolean;
+  valid: boolean;
 
   constructor() {
     super();
@@ -137,9 +152,11 @@ export default class Register extends Vue {
     this.showPassword = false;
     this.isSnackbarOpen = false;
     this.showLoadingScreen = false;
+    this.valid = true;
   }
 
   registerUser() {
+    this.form.validate();
     if (!this.areValuesCorrect()) {
       this.openSnackbar("Please complete all the fields", "error");
     } else {

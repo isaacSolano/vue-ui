@@ -1,14 +1,19 @@
 <template>
   <v-container>
     <v-row class="d-flex flex-column align-center">
-      <v-col cols="4">
+      <v-col cols="6">
         <h1 class="text-h4 text-center pa-8">Access to your account :)</h1>
       </v-col>
     </v-row>
 
     <v-row class="d-flex flex-column align-center">
       <v-col cols="6">
-        <v-form class="d-flex flex-column">
+        <v-form
+          class="d-flex flex-column"
+          ref="form"
+          v-model="valid"
+          lazy-validation
+        >
           <v-row class="d-flex flex-column">
             <v-col>
               <v-label>Email Address: </v-label>
@@ -43,7 +48,12 @@
               <v-btn to="/" color="secondary" class="mr-2">
                 Back
               </v-btn>
-              <v-btn color="primary" class="ml-2" @click="verifyInformation()">
+              <v-btn
+                color="primary"
+                class="ml-2"
+                :disabled="!valid"
+                @click="verifyInformation"
+              >
                 Let's go !
               </v-btn>
             </v-col>
@@ -63,6 +73,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
+import { Ref } from "vue-property-decorator";
 
 // Common
 import {
@@ -78,6 +89,7 @@ import { SessionService } from "@/services/session.service";
 // Models
 import { Response } from "@/models/Response";
 import { StatusEnum } from "@/models/StatusEnum";
+import { VForm } from "@/models/Types";
 
 // Other components
 import LoadingScreen from "@/common/LoadingScreen/Index.vue";
@@ -87,6 +99,8 @@ import Snackbar from "@/common/Snackbar/Index.vue";
   components: { LoadingScreen, Snackbar }
 })
 export default class Login extends Vue {
+  @Ref("form") readonly form!: VForm;
+
   rules = inputValidationRules;
   timeout = snackBarTimeout;
 
@@ -101,6 +115,7 @@ export default class Login extends Vue {
   showPassword: boolean;
   isSnackbarOpen: boolean;
   showLoadingScreen: boolean;
+  valid: boolean;
 
   constructor() {
     super();
@@ -116,9 +131,11 @@ export default class Login extends Vue {
     this.showPassword = false;
     this.isSnackbarOpen = false;
     this.showLoadingScreen = false;
+    this.valid = true;
   }
 
   verifyInformation() {
+    this.form.validate();
     if (this.EmailAddress === "" || this.Password === "") {
       this.openSnackbar("Please complete all the fields", "error");
     } else {
@@ -155,6 +172,7 @@ export default class Login extends Vue {
     this.isSnackbarOpen = true;
     this.snackbarText = text;
     this.snackbarColor = color;
+    setTimeout(() => this.closeSnackbar(), this.timeout);
   }
 
   closeSnackbar() {
