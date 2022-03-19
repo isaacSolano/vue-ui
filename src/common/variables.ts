@@ -10,3 +10,4 @@ export const inputValidationRules = {
 export const snackBarTimeout = 2000;
 export const successColor = "light-green darken-1";
 export const errorColor = "red darken-2";
+export const javaBackendURL = "https://localhost:8080";

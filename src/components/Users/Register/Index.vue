@@ -108,12 +108,12 @@ import {
 } from "@/common/variables";
 
 // Services
-import { UserService } from "@/services/user.service";
+import { DataService } from "@/services/data.service";
 
 // Models
 import { User } from "@/models/User";
 import { Response } from "@/models/Response";
-import { StatusEnum } from "@/models/StatusEnum";
+import { ResponseStatusType } from "@/models/ResponseStatusType";
 import { VForm } from "@/models/Types";
 
 // Other components
@@ -129,7 +129,7 @@ export default class Register extends Vue {
   rules = inputValidationRules;
   timeout = snackBarTimeout;
 
-  userService: UserService;
+  DataService: DataService;
   userToBeRegistered: User;
 
   snackbarText: string;
@@ -143,7 +143,7 @@ export default class Register extends Vue {
   constructor() {
     super();
 
-    this.userService = new UserService();
+    this.DataService = new DataService();
     this.userToBeRegistered = new User();
 
     this.snackbarText = "";
@@ -161,10 +161,9 @@ export default class Register extends Vue {
       this.openSnackbar("Please complete all the fields", "error");
     } else {
       this.showLoadingScreen = true;
-      this.userService
-        .registerUser(this.userToBeRegistered)
+      this.DataService.registerUser(this.userToBeRegistered)
         .then((res: Response) => {
-          if (res.Type === StatusEnum.Success) {
+          if (res.Type === ResponseStatusType.SUCCESS) {
             this.openSnackbar(res.Message, (this.snackbarColor = successColor));
             this.showLoadingScreen = false;
           }

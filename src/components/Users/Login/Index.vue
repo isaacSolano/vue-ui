@@ -83,17 +83,17 @@ import {
 } from "@/common/variables";
 
 // Services
-import { UserService } from "@/services/user.service";
+import { DataService } from "@/services/data.service";
 import { SessionService } from "@/services/session.service";
 
 // Models
 import { Response } from "@/models/Response";
-import { StatusEnum } from "@/models/StatusEnum";
 import { VForm } from "@/models/Types";
 
 // Other components
 import LoadingScreen from "@/common/LoadingScreen/Index.vue";
 import Snackbar from "@/common/Snackbar/Index.vue";
+import { ResponseStatusType } from "@/models/ResponseStatusType";
 
 @Component({
   components: { LoadingScreen, Snackbar }
@@ -104,7 +104,7 @@ export default class Login extends Vue {
   rules = inputValidationRules;
   timeout = snackBarTimeout;
 
-  userService: UserService;
+  DataService: DataService;
   sessionService: SessionService;
 
   EmailAddress: string;
@@ -120,7 +120,7 @@ export default class Login extends Vue {
   constructor() {
     super();
 
-    this.userService = new UserService();
+    this.DataService = new DataService();
     this.sessionService = new SessionService();
 
     this.EmailAddress = "";
@@ -139,16 +139,16 @@ export default class Login extends Vue {
     if (this.EmailAddress === "" || this.Password === "") {
       this.openSnackbar("Please complete all the fields", "error");
     } else {
-      this.userService
+      this.DataService
         .loginUser(this.EmailAddress, this.Password)
         .then((res: Response) => {
           this.isSnackbarOpen = true;
           switch (res.Type) {
-            case StatusEnum.Error:
+            case ResponseStatusType.ERROR:
               this.openSnackbar(res.Message, "error");
               break;
 
-            case StatusEnum.Success:
+            case ResponseStatusType.SUCCESS:
               this.openSnackbar(res.Message, successColor);
               this.showLoadingScreen = true;
               this.sessionService.createSession(

@@ -25,7 +25,7 @@ import Component from "vue-class-component";
 import { snackBarTimeout } from "@/common/variables";
 
 // Services
-import { UserService } from "@/services/user.service";
+import { DataService } from "@/services/data.service";
 import { SessionService } from "@/services/session.service";
 
 // Models
@@ -41,7 +41,7 @@ import LoadingScreen from "@/common/LoadingScreen/Index.vue";
 export default class Dashboard extends Vue {
   timeout = snackBarTimeout;
 
-  userService: UserService;
+  DataService: DataService;
   sessionService: SessionService;
 
   activeUser: User;
@@ -53,7 +53,7 @@ export default class Dashboard extends Vue {
   constructor() {
     super();
 
-    this.userService = new UserService();
+    this.DataService = new DataService();
     this.sessionService = new SessionService();
 
     this.activeUser = new User();
@@ -71,7 +71,7 @@ export default class Dashboard extends Vue {
     if (this.activeEmailAddress === "not-found") {
       this.$router.push("/");
     } else {
-      this.activeUser = this.userService.getUserById(this.activeEmailAddress);
+      this.activeUser = this.DataService.getUserById(this.activeEmailAddress);
     }
   }
 

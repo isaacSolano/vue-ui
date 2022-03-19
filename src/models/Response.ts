@@ -1,11 +1,13 @@
-import { StatusEnum } from "./StatusEnum";
+import { ResponseStatusType } from "./ResponseStatusType";
 
 export class Response {
-  Type: StatusEnum;
+  Type: ResponseStatusType;
   Message: string;
+  Data: [] | null;
 
-  constructor(type: StatusEnum, message: string) {
+  constructor(type: ResponseStatusType, message: string, data?: []) {
     this.Type = type;
     this.Message = message;
+    this.Data = data || null;
   }
 }

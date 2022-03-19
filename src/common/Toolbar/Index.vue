@@ -27,7 +27,7 @@ import { Prop, Emit } from "vue-property-decorator";
 import { snackBarTimeout } from "@/common/variables";
 
 // Services
-import { UserService } from "@/services/user.service";
+import { DataService } from "@/services/data.service";
 import { SessionService } from "@/services/session.service";
 
 @Component({})
@@ -42,13 +42,13 @@ export default class Toolbar extends Vue {
 
   timeout = snackBarTimeout;
 
-  userService: UserService;
+  DataService: DataService;
   sessionService: SessionService;
 
   constructor() {
     super();
 
-    this.userService = new UserService();
+    this.DataService = new DataService();
     this.sessionService = new SessionService();
 
     this.firstName = "";

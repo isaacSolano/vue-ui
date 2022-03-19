@@ -1,8 +1,8 @@
 import { User } from "@/models/User";
 import { Response } from "@/models/Response";
-import { StatusEnum } from "@/models/StatusEnum";
+import { ResponseStatusType } from "@/models/ResponseStatusType";
 
-export class UserService {
+export class DataService {
   public async loginUser(
     emailAddress: string,
     password: string
@@ -11,14 +11,14 @@ export class UserService {
 
     if (userToBeVerified === undefined) {
       return new Response(
-        StatusEnum.Error,
+        ResponseStatusType.ERROR,
         "This email address is not registered."
       );
     } else if (userToBeVerified.Password === password) {
-      return new Response(StatusEnum.Success, "Welcome :)");
+      return new Response(ResponseStatusType.SUCCESS, "Welcome :)");
     } else {
       return new Response(
-        StatusEnum.Error,
+        ResponseStatusType.ERROR,
         "Sorry, the user couldn't be verified."
       );
     }
@@ -29,7 +29,7 @@ export class UserService {
     allUsers.push(user);
     localStorage.setItem("usersLS", JSON.stringify(allUsers));
 
-    return new Response(StatusEnum.Success, "User registered");
+    return new Response(ResponseStatusType.SUCCESS, "User registered");
   }
 
   public getUserById(id: string): User {
