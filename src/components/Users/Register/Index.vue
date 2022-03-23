@@ -161,13 +161,14 @@ export default class Register extends Vue {
       this.openSnackbar("Please complete all the fields", "error");
     } else {
       this.showLoadingScreen = true;
-      this.DataService.registerUser(this.userToBeRegistered)
-        .then((res: Response) => {
+      this.DataService.registerUser(this.userToBeRegistered).then(
+        (res: Response) => {
           if (res.Type === ResponseStatusType.SUCCESS) {
             this.openSnackbar(res.Message, (this.snackbarColor = successColor));
             this.showLoadingScreen = false;
           }
-        });
+        }
+      );
     }
   }
 
